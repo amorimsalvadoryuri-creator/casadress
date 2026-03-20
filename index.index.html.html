@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Casa Dress</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  background:#111b21;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+}
+
+.shell{
+  width:100%;max-width:430px;
+  height:100vh;max-height:860px;
+  display:flex;flex-direction:column;
+  background:#0b141a;
+  overflow:hidden;
+  box-shadow:0 0 60px rgba(0,0,0,.7);
+}
+
+/* status bar */
+.sbar{
+  background:#1f2c34;
+  padding:5px 16px 4px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+.sbar-time{color:#fff;font-size:12px;font-weight:600}
+.sbar-r{display:flex;gap:5px;align-items:center}
+.sbar-r svg{fill:#fff;width:13px;height:13px}
+
+/* header */
+.hdr{
+  background:#1f2c34;
+  padding:8px 12px 10px;
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;border-bottom:1px solid #2a3942;
+}
+.back{color:#00a884;font-size:24px;cursor:pointer;padding:0 4px;line-height:1}
+.av{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,#c47c74,#a85f58);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;color:#fff;
+  flex-shrink:0;position:relative;
+}
+.av-dot{
+  position:absolute;bottom:1px;right:1px;
+  width:9px;height:9px;border-radius:50%;
+  background:#00a884;border:1.5px solid #1f2c34;
+}
+.hdr-info{flex:1;min-width:0}
+.hdr-name{color:#e9edef;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-status{color:#8696a0;font-size:12px;margin-top:1px}
+.hdr-icons{display:flex;gap:16px;align-items:center;flex-shrink:0}
+.hdr-icons svg{fill:#aebac1;width:21px;height:21px}
+
+/* chat area */
+.chat{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:10px 10px 8px;
+  display:flex;flex-direction:column;gap:2px;
+  background-color:#0b141a;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='%23182229' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+.chat::-webkit-scrollbar{width:4px}
+.chat::-webkit-scrollbar-thumb{background:#2a3942;border-radius:4px}
+
+/* date chip */
+.date-chip{text-align:center;margin:6px 0}
+.date-chip span{background:#182229;color:#8696a0;font-size:11px;padding:4px 10px;border-radius:7px;display:inline-block}
+
+/* bubbles */
+.row{display:flex;margin-bottom:1px;animation:pop .2s ease both}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.row.in{justify-content:flex-start}
+.row.out{justify-content:flex-end}
+
+.bub{
+  max-width:76%;padding:7px 10px 4px;
+  border-radius:8px;font-size:14px;line-height:1.45;
+  position:relative;word-break:break-word;white-space:pre-wrap;
+}
+.row.in .bub{background:#202c33;color:#e9edef;border-top-left-radius:0}
+.row.in .bub::before{
+  content:'';position:absolute;top:0;left:-8px;
+  border-top:8px solid #202c33;border-left:8px solid transparent;
+}
+.row.out .bub{background:#005c4b;color:#e9edef;border-top-right-radius:0}
+.row.out .bub::before{
+  content:'';position:absolute;top:0;right:-8px;
+  border-top:8px solid #005c4b;border-right:8px solid transparent;
+}
+.bub-meta{
+  display:flex;justify-content:flex-end;align-items:center;gap:3px;
+  margin-top:3px;font-size:11px;color:#8696a0;white-space:nowrap;
+}
+.row.out .bub-meta{color:#8dc8be}
+.tick{font-size:12px;color:#53bdeb}
+
+/* typing */
+.typing-row{display:flex;justify-content:flex-start;margin-bottom:2px;animation:pop .2s ease both}
+.typing-bub{
+  background:#202c33;border-radius:8px;border-top-left-radius:0;
+  padding:12px 16px;display:flex;gap:5px;align-items:center;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:#8696a0;animation:bounce 1.3s infinite}
+.dot:nth-child(2){animation-delay:.15s}
+.dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+/* quick replies */
+.qr{
+  padding:6px 10px 4px;
+  display:flex;gap:7px;flex-wrap:wrap;
+  background:#0b141a;flex-shrink:0;
+  min-height:0;
+}
+.qr-btn{
+  background:#202c33;border:1px solid #2a3942;
+  color:#00a884;border-radius:18px;
+  padding:6px 13px;font-size:13px;
+  cursor:pointer;font-family:inherit;font-weight:500;
+  transition:background .15s;
+}
+.qr-btn:hover{background:#2a3942}
+
+/* whatsapp card */
+.wa-card{
+  margin:8px 10px 4px;
+  background:#1a2e22;border:1px solid #2d4a35;
+  border-radius:12px;padding:12px 14px;
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;animation:pop .3s ease both;
+}
+.wa-card-txt{flex:1;min-width:0}
+.wa-card-title{color:#e9edef;font-size:13px;font-weight:600;margin-bottom:2px}
+.wa-card-sub{color:#8696a0;font-size:12px}
+.wa-btn{
+  background:#25d366;border:none;border-radius:20px;
+  padding:9px 14px;color:#fff;font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
+}
+
+/* input */
+.ibar{
+  background:#1f2c34;padding:8px 10px;
+  display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+.emoji-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#8696a0;flex-shrink:0}
+.iwrap{
+  flex:1;background:#2a3942;border-radius:22px;
+  display:flex;align-items:center;padding:0 14px;min-height:42px;
+}
+.ifield{
+  flex:1;background:none;border:none;outline:none;
+  color:#e9edef;font-size:15px;font-family:inherit;
+  line-height:1.4;padding:8px 0;caret-color:#00a884;
+}
+.ifield::placeholder{color:#8696a0}
+.send-btn{
+  width:44px;height:44px;border-radius:50%;
+  background:#00a884;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:transform .1s;
+}
+.send-btn:active{transform:scale(.93)}
+.send-btn svg{fill:#fff;width:20px;height:20px;margin-left:2px}
+
+@media(min-width:480px){
+  .shell{border-radius:20px;height:92vh}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="sbar">
+    <span class="sbar-time" id="clock">00:00</span>
+    <div class="sbar-r">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <div class="hdr">
+    <div class="back">‹</div>
+    <div class="av">L<div class="av-dot"></div></div>
+    <div class="hdr-info">
+      <div class="hdr-name">Ludimila · Casa Dress</div>
+      <div class="hdr-status" id="statusTxt">online</div>
+    </div>
+    <div class="hdr-icons">
+      <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    </div>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="date-chip"><span>HOJE</span></div>
+  </div>
+
+  <div class="qr" id="qr"></div>
+
+  <div class="ibar">
+    <button class="emoji-btn">😊</button>
+    <div class="iwrap">
+      <input class="ifield" id="inp" placeholder="Mensagem" autocomplete="off" autocorrect="off">
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="onSend()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+//  ⚠️  SUAS CONFIGURAÇÕES — edite aqui
+// ============================================================
+var API_KEY      = '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';
+var MEU_NUMERO   = '5521980006032';
+// ============================================================
+
+var PROMPT = 'Você é Ludimila, vendedora especialista em moda feminina da Casa Dress — altamente persuasiva, simpática e estratégica, com foco em conversão de vendas via WhatsApp.\n\nOBJETIVO: Entender rapidamente o estilo e necessidade da cliente, sugerir produtos personalizados, criar desejo e conduzir até a compra.\n\nTOM DE VOZ:\n- Amigável, próximo, feminino e elegante\n- Nunca robótico — sempre natural e acolhedor\n- Emojis com moderação (✨😍🖤💖)\n- Respostas curtas, estilo WhatsApp real\n- Sem asteriscos, sem markdown, sem listas com traços\n\nFLUXO:\n1. ABERTURA: cumprimente de forma calorosa\n2. DESCOBERTA: pergunte ocasião, estilo, tamanho, cor, faixa de preço (sutil)\n3. CURADORIA: máximo 3 opções, look completo, destaque caimento/conforto/versatilidade\n4. GATILHOS (1 por conversa): escassez, exclusividade ou facilidade\n5. FECHAMENTO: "Posso já separar esse pra você e te enviar o link de pagamento? 💖"\n6. OBJEÇÕES: reforce benefícios, ofereça alternativa, nunca pressione\n7. PÓS-VENDA: agradeça, sugira looks futuros\n\nREGRAS: nunca invente preços, nunca prometa prazos, sempre personalize, escreva como WhatsApp real.';
+
+var history  = [];
+var busy     = false;
+var trocas   = 0;
+var perfil   = {ocasiao:'', estilo:'', tamanho:'', cor:'', preco:'', interesse:''};
+
+// relógio
+function tick() {
+  var d = new Date();
+  var h = ('0'+d.getHours()).slice(-2);
+  var m = ('0'+d.getMinutes()).slice(-2);
+  document.getElementById('clock').textContent = h+':'+m;
+}
+tick();
+setInterval(tick, 10000);
+
+function now() {
+  var d = new Date();
+  return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+}
+
+function setStatus(t){ document.getElementById('statusTxt').textContent = t; }
+
+function addBubble(text, dir) {
+  var chat = document.getElementById('chat');
+  var row  = document.createElement('div');
+  row.className = 'row '+dir;
+  var bub  = document.createElement('div');
+  bub.className = 'bub';
+  bub.textContent = text;
+  var meta = document.createElement('div');
+  meta.className = 'bub-meta';
+  meta.textContent = now();
+  if (dir === 'out') {
+    var tick = document.createElement('span');
+    tick.className = 'tick';
+    tick.textContent = ' ✓✓';
+    meta.appendChild(tick);
+  }
+  bub.appendChild(meta);
+  row.appendChild(bub);
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping() {
+  var chat = document.getElementById('chat');
+  var row  = document.createElement('div');
+  row.className = 'typing-row';
+  row.id = 'typing';
+  var bub = document.createElement('div');
+  bub.className = 'typing-bub';
+  for (var i=0;i<3;i++){
+    var d = document.createElement('div');
+    d.className = 'dot';
+    bub.appendChild(d);
+  }
+  row.appendChild(bub);
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function hideTyping() {
+  var el = document.getElementById('typing');
+  if (el) el.remove();
+}
+
+function setQR(opts) {
+  var qr = document.getElementById('qr');
+  qr.innerHTML = '';
+  opts.forEach(function(o){
+    var b = document.createElement('button');
+    b.className = 'qr-btn';
+    b.textContent = o;
+    b.onclick = function(){ qr.innerHTML=''; doSend(o); };
+    qr.appendChild(b);
+  });
+}
+
+function extrair(user, bot) {
+  var u = user.toLowerCase(), b = bot.toLowerCase();
+  ['festa','trabalho','casual','date','viagem','formatura','casamento','jantar'].forEach(function(x){
+    if((u.includes(x)||b.includes(x))&&!perfil.ocasiao) perfil.ocasiao=x;
+  });
+  ['elegante','básico','moderno','confortável','sexy','despojado'].forEach(function(x){
+    if((u.includes(x)||b.includes(x))&&!perfil.estilo) perfil.estilo=x;
+  });
+  ['vestido','blusa','calça','saia','conjunto','blazer','cropped','macacão','shorts'].forEach(function(x){
+    if(b.includes(x)&&!perfil.interesse) perfil.interesse=x;
+  });
+  ['pp','tam p',' m ','tam m',' g ','tam g','gg'].forEach(function(x){
+    if(u.includes(x)&&!perfil.tamanho) perfil.tamanho=x.trim().toUpperCase();
+  });
+  ['preto','branco','nude','rosa','azul','vermelho','neutro','bege','colorido'].forEach(function(x){
+    if((u.includes(x)||b.includes(x))&&!perfil.cor) perfil.cor=x;
+  });
+  var pm = u.match(/(?:at[eé]|uns?)\s*r?\$?\s*(\d+)/i)||u.match(/r?\$\s*(\d+)/i)||u.match(/(\d{2,4})\s*(?:reais|conto)/i);
+  if(pm&&!perfil.preco) perfil.preco='R$ '+pm[1];
+}
+
+function montarResumo() {
+  var l = ['🌸 *Nova cliente da Casa Dress!*',''];
+  l.push('📋 *Resumo do atendimento:*');
+  if(perfil.ocasiao)   l.push('• Ocasião: '+perfil.ocasiao);
+  if(perfil.estilo)    l.push('• Estilo: '+perfil.estilo);
+  if(perfil.tamanho)   l.push('• Tamanho: '+perfil.tamanho);
+  if(perfil.cor)       l.push('• Cor: '+perfil.cor);
+  if(perfil.preco)     l.push('• Faixa de preço: '+perfil.preco);
+  if(perfil.interesse) l.push('• Interesse: '+perfil.interesse);
+  l.push('');
+  l.push('💬 *Conversa:*');
+  history.forEach(function(m){
+    l.push((m.role==='user'?'👤 Cliente':'🌸 Ludimila')+': '+m.content);
+  });
+  l.push('');
+  l.push('_(via chat Casa Dress)_');
+  return l.join('\n');
+}
+
+function mostrarCardWA() {
+  if(document.getElementById('waCard')) return;
+  var card = document.createElement('div');
+  card.id = 'waCard';
+  card.className = 'wa-card';
+  card.innerHTML =
+    '<div class="wa-card-txt">'+
+      '<div class="wa-card-title">Quer garantir esse look? 💖</div>'+
+      '<div class="wa-card-sub">Toque para falar comigo no WhatsApp!</div>'+
+    '</div>'+
+    '<button class="wa-btn" id="waBtnEl">'+
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.116 1.524 5.847L0 24l6.335-1.484A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.017-1.375l-.36-.214-3.732.874.915-3.64-.235-.374A9.818 9.818 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>'+
+      'Falar agora'+
+    '</button>';
+  var ibar = document.querySelector('.ibar');
+  ibar.parentNode.insertBefore(card, ibar);
+  document.getElementById('waBtnEl').onclick = function(){
+    var txt = encodeURIComponent(montarResumo());
+    window.open('https://wa.me/'+MEU_NUMERO+'?text='+txt,'_blank');
+  };
+}
+
+async function doSend(text) {
+  if(!text || !text.trim() || busy) return;
+  busy = true;
+
+  addBubble(text, 'out');
+  document.getElementById('inp').value = '';
+  document.getElementById('qr').innerHTML = '';
+  history.push({role:'user', content:text});
+
+  setStatus('digitando...');
+  showTyping();
+  await new Promise(function(r){setTimeout(r, 800+Math.random()*600)});
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: PROMPT,
+        messages: history
+      })
+    });
+
+    var data = await res.json();
+    var reply = (data.content && data.content[0] && data.content[0].text)
+      ? data.content[0].text
+      : 'Oi linda, tive um probleminha aqui. Pode repetir? 😊';
+
+    hideTyping();
+    setStatus('online');
+    history.push({role:'assistant', content:reply});
+    addBubble(reply, 'in');
+    extrair(text, reply);
+    trocas++;
+
+    // mostra botão WhatsApp após 3 trocas ou menção de fechamento
+    var low = reply.toLowerCase();
+    if(trocas>=3 || low.includes('separar') || low.includes('link') || low.includes('pagamento')) {
+      mostrarCardWA();
+    }
+
+    // quick replies contextuais
+    if(low.includes('ocasião')||low.includes('procurando')||low.includes('guarda-roupa')) {
+      setQR(['Trabalho 💼','Festa 🎉','Casual 😊','Date ✨','Viagem 🌍']);
+    } else if(low.includes('estilo')||low.includes('prefere')||low.includes('gosta')) {
+      setQR(['Elegante ✨','Básico 🤍','Moderno 🖤','Confortável 😊']);
+    } else if(low.includes('tamanho')||low.includes('numeração')) {
+      setQR(['PP','P','M','G','GG']);
+    } else if(low.includes('cor')||low.includes('paleta')) {
+      setQR(['Neutros 🤍','Preto 🖤','Rosa 🌸','Colorido 🌈']);
+    } else if(low.includes('separar')||low.includes('link')||low.includes('pagamento')) {
+      setQR(['Sim, quero! 💖','Tenho uma dúvida 🤔','Vou pensar...']);
+    } else if(low.includes('outra')||low.includes('mais opção')) {
+      setQR(['Mostra mais! ✨','Esse eu gostei 💖','Outro estilo']);
+    }
+
+  } catch(e) {
+    hideTyping();
+    setStatus('online');
+    addBubble('Ops, tive um probleminha! Pode repetir? 😊', 'in');
+    console.error(e);
+  }
+
+  busy = false;
+}
+
+function onSend() {
+  var v = document.getElementById('inp').value.trim();
+  if(v) doSend(v);
+}
+
+document.getElementById('inp').addEventListener('keydown', function(e){
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); onSend(); }
+});
+
+// saudação inicial
+(async function(){
+  await new Promise(function(r){setTimeout(r,600)});
+  setStatus('digitando...');
+  showTyping();
+  await new Promise(function(r){setTimeout(r,1500)});
+  hideTyping();
+  setStatus('online');
+  var msg = 'Oi linda! 😍 Seja bem-vinda à Casa Dress! Me conta, você está procurando algo para uma ocasião especial ou quer renovar o guarda-roupa?';
+  history.push({role:'assistant', content:msg});
+  addBubble(msg, 'in');
+  setQR(['Ocasião especial ✨','Renovar o guarda-roupa 😊','Só dando uma olhada 👀']);
+})();
+</script>
+</body>
+</html>
